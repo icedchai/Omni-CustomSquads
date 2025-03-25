@@ -78,7 +78,7 @@
                 SquadEventHandler.NtfPool.AddEntry(vanilla, Config.NtfVanillaChance);
             }
 
-            for (int i = 1; i < Config.CustomSquads.Count; i++)
+            for (int i = 0; i < Config.CustomSquads.Count; i++)
             {
                 CustomSquad squad = Config.CustomSquads[i];
                 if (squad.SpawnChance == 0)
