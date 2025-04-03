@@ -42,6 +42,9 @@
       <HintPath>..\..\dependancies\EXILEDREF\Assembly-CSharp-Publicized.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ColdWaterLibrary">
+      <HintPath>..\ColdWaterLibrary\bin\Debug\ColdWaterLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ExMod.Exiled.9.5.1\lib\net48\CommandSystem.Core.dll</HintPath>
     </Reference>
@@ -72,9 +75,6 @@
     <Reference Include="NorthwoodLib, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ExMod.Exiled.9.5.1\lib\net48\NorthwoodLib.dll</HintPath>
     </Reference>
-    <Reference Include="Omni-CommonLibrary">
-      <HintPath>..\omni-plugins-pub\builds\Omni-CommonLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="PluginAPI, Version=13.1.5.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\ExMod.Exiled.9.5.1\lib\net48\PluginAPI.dll</HintPath>
     </Reference>
@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="EventHandlers\CustomSquad.cs" />
     <Compile Include="EventHandlers\SquadEventHandler.cs" />
     <Compile Include="ForceWaveCommand.cs" />
     <Compile Include="Plugin.cs" />

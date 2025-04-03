@@ -10,7 +10,6 @@
     using Exiled.API.Features;
     using Exiled.Events.Handlers;
     using Omni_CustomSquads.EventHandlers;
-    using OmniCommonLibrary;
     using PlayerRoles;
 
     /// <summary>
@@ -52,7 +51,7 @@
         public override string Prefix => "omni_customsquads";
 
         /// <inheritdoc/>
-        public override Version Version => new Version(0, 0, 1);
+        public override Version Version => new Version(1, 0, 0);
 
         /// <inheritdoc/>
         public override void OnEnabled()

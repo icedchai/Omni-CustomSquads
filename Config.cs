@@ -6,7 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using Exiled.API.Interfaces;
-    using OmniCommonLibrary;
+    using Omni_CustomSquads.EventHandlers;
 
     /// <summary>
     /// Config class.

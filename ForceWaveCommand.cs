@@ -9,7 +9,6 @@
     using Exiled.API.Extensions;
     using Exiled.API.Features;
     using Omni_CustomSquads.EventHandlers;
-    using OmniCommonLibrary;
     using PlayerRoles;
 
     [CommandHandler(typeof(RemoteAdminCommandHandler))]

@@ -5,11 +5,12 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using ColdWaterLibrary.Extensions;
+    using ColdWaterLibrary.Types;
     using Exiled.API.Features;
     using Exiled.Events.EventArgs.Map;
     using Exiled.Events.EventArgs.Server;
     using MEC;
-    using OmniCommonLibrary;
     using PlayerRoles;
     using Respawning.NamingRules;
 
@@ -189,7 +190,7 @@
                             }
 
                             Player player = e.Players.RandomItem();
-                            Timing.CallDelayed(0.01f, () => player.SetOverallRole(roleType));
+                            Timing.CallDelayed(0.01f, () => player.SetOverallRoleType(roleType));
                             e.Players.Remove(player);
                             Log.Info($"Spawned {player} for {customSquad.SquadName}");
                         }
@@ -237,7 +238,7 @@
                             }
 
                             Player player = e.Players.RandomItem();
-                            Timing.CallDelayed(0.01f, () => player.SetOverallRole(roleType));
+                            Timing.CallDelayed(0.01f, () => player.SetOverallRoleType(roleType));
                             e.Players.Remove(player);
                             Log.Info($"Spawned {player} for {customSquad.SquadName}");
                         }
