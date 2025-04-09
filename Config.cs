@@ -21,7 +21,7 @@
         /// <summary>
         /// Gets or sets a value indicating whether the plugin is in debug mode.
         /// </summary>
-        public bool Debug { get; set; } = true;
+        public bool Debug { get; set; } = false;
 
         public int CiVanillaChance { get; set; } = 100;
         public int NtfVanillaChance { get; set; } = 100;
@@ -29,6 +29,9 @@
         /// <summary>
         /// Gets or sets the list of <see cref="CustomSquad"/> to be registered.
         /// </summary>
-        public List<CustomSquad> CustomSquads { get; set; } = new ();
+        public List<CustomSquad> CustomSquads { get; set; } = new List<CustomSquad>
+        {
+            new CustomSquad(),
+        };
     }
 }

@@ -25,7 +25,7 @@
         {
             string output = string.Empty;
             string[] thing = unit.Split('-'); // thing = ["HOTEL", "09"]
-            output += $"nato_{unit[0]} {thing[1]}"; // output = "nato_H 09"
+            output += $"nato_{unit[0]} {(thing[1][0] == '0' ? thing[1][1] : thing[1])}"; // output = "nato_H 09"
             return output;
         }
 
@@ -156,6 +156,7 @@
                 Log.Debug("aa");
                 return;
             }
+
             Log.Debug("bb");
             switch (e.NextKnownTeam)
             {

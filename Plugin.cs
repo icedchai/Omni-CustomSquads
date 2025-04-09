@@ -60,6 +60,8 @@
 
             Singleton = this;
 
+            Log.Debug("Tested");
+
             if (Config.CustomSquads.Count == 0)
             {
                 return;
@@ -82,7 +84,7 @@
                 CustomSquad squad = Config.CustomSquads[i];
                 if (squad.SpawnChance == 0)
                 {
-                    return;
+                    continue;
                 }
 
                 squad.SquadName = squad.SquadName.ToLower();
