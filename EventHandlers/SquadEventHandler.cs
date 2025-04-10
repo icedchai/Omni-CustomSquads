@@ -83,14 +83,33 @@
         /// <param name="e">The event args.</param>
         public static void OnTeamVehicleSpawning(SpawningTeamVehicleEventArgs e)
         {
-            if (Plugin.NextWaveCi != null)
+            if (e.Team.TargetFaction == Faction.FoundationStaff)
             {
-                e.IsAllowed = Plugin.NextWaveCi.UseTeamVehicle;
-            }
+                if (Plugin.NextWaveNtf is null)
+                {
+                    Plugin.NextWaveNtf = NtfPool.GetRandomSquad();
+                }
 
-            if (Plugin.NextWaveNtf != null)
+                if (Plugin.NextWaveNtf.UseTeamVehicle || Plugin.NextWaveNtf.SquadName == Plugin.VanillaSquad)
+                {
+                    return;
+                }
+
+                e.IsAllowed = false;
+            }
+            else
             {
-                e.IsAllowed = Plugin.NextWaveNtf.UseTeamVehicle;
+                if (Plugin.NextWaveCi is null)
+                {
+                    Plugin.NextWaveCi = CiPool.GetRandomSquad();
+                }
+
+                if (Plugin.NextWaveCi.UseTeamVehicle || Plugin.NextWaveCi.SquadName == Plugin.VanillaSquad)
+                {
+                    return;
+                }
+
+                e.IsAllowed = false;
             }
         }
 
@@ -106,14 +125,9 @@
                 return;
             }
 
-            if (!Plugin.NextWaveCi.UseCassieAnnouncement)
-            {
-                e.IsAllowed = false;
-                Plugin.NextWaveCi = null;
-                return;
-            }
-
             Log.Debug("Announcing CHAOS ENTRANCE: Custom Squad Detected");
+            // Timing.CallDelayed(0.01f, Cassie.Clear);
+            Plugin.NextWaveCi = null;
             e.IsAllowed = false;
         }
 
@@ -130,16 +144,47 @@
                 return;
             }
 
-            if (!Plugin.NextWaveNtf.UseCassieAnnouncement)
-            {
-                e.IsAllowed = false;
-                Plugin.NextWaveNtf = null;
-                return;
-            }
-
             Log.Debug("Announcing NTF ENTRANCE: Custom Squad Detected");
             Plugin.NextWaveNtf = null;
             e.IsAllowed = false;
+        }
+
+        private static void HandleSpawnWave(CustomSquad customSquad, List<Player> players)
+        {
+            foreach (char c in customSquad.SpawnQueue)
+            {
+                if (players.IsEmpty())
+                {
+                    Log.Info($"Finished spawning {customSquad.SquadName}");
+                    break;
+                }
+
+                OverallRoleType roleType;
+                if (!customSquad.CustomRoles.TryGetValue(c, out roleType))
+                {
+                    Log.Info($"Couldn't find the specified role of Key {c} in {customSquad.SquadName}'s roles.");
+                    break;
+                }
+
+                Player player = players.RandomItem();
+                Timing.CallDelayed(0.01f, () => player.SetOverallRoleType(roleType));
+                players.Remove(player);
+                Log.Info($"Spawned {player} for {customSquad.SquadName}");
+            }
+
+            if (customSquad.UseCassieAnnouncement)
+            {
+                // This delay ensures that the plugin grabs the correct "latest" Unit Name
+                Timing.CallDelayed(0.01f, () =>
+                {
+                    string announcement = customSquad.EntranceAnnouncement;
+                    string announcementSubs = customSquad.EntranceAnnouncementSubs;
+
+                    announcement = announcement.Replace("%division%", MakeUnitNameReadable(NamingRulesManager.GeneratedNames[Team.FoundationForces].LastOrDefault()));
+                    announcementSubs = announcementSubs.Replace("%division%", NamingRulesManager.GeneratedNames[Team.FoundationForces].LastOrDefault());
+                    Cassie.MessageTranslated(announcement, announcementSubs);
+                });
+            }
         }
 
         /// <summary>
@@ -173,37 +218,7 @@
                             }
                         }
 
-                        e.IsAllowed = false;
-                        Plugin.NextWaveCi = null;
-                        foreach (char c in customSquad.SpawnQueue)
-                        {
-                            if (e.Players.IsEmpty())
-                            {
-                                Log.Info($"Finished spawning {customSquad.SquadName}");
-                                break;
-                            }
-
-                            OverallRoleType roleType;
-                            if (!customSquad.CustomRoles.TryGetValue(c, out roleType))
-                            {
-                                Log.Info($"Couldn't find the specified role of Key {c} in {customSquad.SquadName}'s roles.");
-                                break;
-                            }
-
-                            Player player = e.Players.RandomItem();
-                            Timing.CallDelayed(0.01f, () => player.SetOverallRoleType(roleType));
-                            e.Players.Remove(player);
-                            Log.Info($"Spawned {player} for {customSquad.SquadName}");
-                        }
-
-                        if (customSquad.UseCassieAnnouncement)
-                        {
-                            string announcement = customSquad.EntranceAnnouncement;
-                            string announcementSubs = customSquad.EntranceAnnouncementSubs;
-
-                            Cassie.MessageTranslated(announcement, announcementSubs);
-                        }
-
+                        HandleSpawnWave(customSquad, e.Players);
                         break;
                     }
 
@@ -217,47 +232,11 @@
                             customSquad = Plugin.NextWaveNtf;
                             if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
                             {
-                                Log.Debug("Regular spawn");
                                 return;
                             }
-                            Log.Debug("modded spawn");
                         }
 
-                        foreach (char c in customSquad.SpawnQueue)
-                        {
-                            if (e.Players.IsEmpty())
-                            {
-                                Log.Info($"Finished spawning {customSquad.SquadName}");
-                                break;
-                            }
-
-                            OverallRoleType roleType;
-                            if (!customSquad.CustomRoles.TryGetValue(c, out roleType))
-                            {
-                                Log.Info($"Couldn't find the specified role of Key {c} in {customSquad.SquadName}'s roles.");
-                                break;
-                            }
-
-                            Player player = e.Players.RandomItem();
-                            Timing.CallDelayed(0.01f, () => player.SetOverallRoleType(roleType));
-                            e.Players.Remove(player);
-                            Log.Info($"Spawned {player} for {customSquad.SquadName}");
-                        }
-
-                        if (customSquad.UseCassieAnnouncement)
-                        {
-                            // This delay ensures that the plugin grabs the correct "latest" Unit Name
-                            Timing.CallDelayed(0.01f, () =>
-                            {
-                                string announcement = customSquad.EntranceAnnouncement;
-                                string announcementSubs = customSquad.EntranceAnnouncementSubs;
-
-                                announcement = announcement.Replace("%division%", MakeUnitNameReadable(NamingRulesManager.GeneratedNames[Team.FoundationForces].LastOrDefault()));
-                                announcementSubs = announcementSubs.Replace("%division%", NamingRulesManager.GeneratedNames[Team.FoundationForces].LastOrDefault());
-                                Cassie.MessageTranslated(announcement, announcementSubs);
-                            });
-                        }
-
+                        HandleSpawnWave(customSquad, players);
                         break;
                     }
 
