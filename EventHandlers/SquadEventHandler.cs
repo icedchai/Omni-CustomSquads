@@ -17,19 +17,6 @@
     public static class SquadEventHandler
     {
         /// <summary>
-        /// Makes Unit Name readable for CASSIE.
-        /// </summary>
-        /// <param name="unit">The unit name.</param>
-        /// <returns>A CASSIE-readable unit-name.</returns>
-        public static string MakeUnitNameReadable(string unit)
-        {
-            string output = string.Empty;
-            string[] thing = unit.Split('-'); // thing = ["HOTEL", "09"]
-            output += $"nato_{unit[0]} {(thing[1][0] == '0' ? thing[1][1] : thing[1])}"; // output = "nato_H 09"
-            return output;
-        }
-
-        /// <summary>
         /// Squad chance pool.
         /// </summary>
         internal class SquadPool
@@ -57,7 +44,7 @@
 
             public CustomSquad GetRandomSquad()
             {
-                float r = UnityEngine.Random.Range(0f, 1f) * accumulatedWeight;
+                float r = UnityEngine.Random.Range(0.01f, 1f) * accumulatedWeight;
 
                 for (int i = 0; i < entries.Count; i++)
                 {
@@ -180,8 +167,11 @@
                     string announcement = customSquad.EntranceAnnouncement;
                     string announcementSubs = customSquad.EntranceAnnouncementSubs;
 
-                    announcement = announcement.Replace("%division%", MakeUnitNameReadable(NamingRulesManager.GeneratedNames[Team.FoundationForces].LastOrDefault()));
-                    announcementSubs = announcementSubs.Replace("%division%", NamingRulesManager.GeneratedNames[Team.FoundationForces].LastOrDefault());
+                    if (NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule))
+                    {
+                        announcement = announcement.Replace("%division%", rule.TranslateToCassie(rule.LastGeneratedName));
+                        announcementSubs = announcementSubs.Replace("%division%", rule.LastGeneratedName);
+                    }
                     Cassie.MessageTranslated(announcement, announcementSubs);
                 });
             }
@@ -243,6 +233,103 @@
                 default:
                     return;
             }
+        }
+
+        /// <summary>
+        /// Event handler for AnnouncingScpTerminationEvent.
+        /// </summary>
+        /// <param name="e">The event args.</param>
+        public static void OnAnnouncingScpTermination(AnnouncingScpTerminationEventArgs e)
+        {
+            if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.IsEnabled)
+            {
+                return;
+            }
+
+            // Disables SCP termination announcements
+            e.IsAllowed = false;
+        }
+
+
+        /// <summary>
+        /// Announces a subject's death.
+        /// </summary>
+        /// <param name="attacker">The player who killed the victim.</param>
+        /// <param name="victim">The player whose death is being announced.</param>
+        public static void AnnounceSubjectDeath(Player attacker, Player victim)
+        {
+            CustomAnnouncement subjectName = null;
+            if (attacker is null)
+            {
+                foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.Keys)
+                {
+                    if (victim.HasOverallRoleType(newType))
+                    {
+                        Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.TryGetValue(newType, out subjectName);
+                    }
+                }
+
+                if (subjectName is null)
+                {
+                    return;
+                }
+
+                CustomAnnouncement fallback = Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.FallbackTerminationAnnouncement;
+                Cassie.MessageTranslated(fallback.Words.Replace("%subject%", subjectName.Words), fallback.Translation.Replace("%subject%", subjectName.Translation));
+                return;
+            }
+
+            string announcementName = null;
+            foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.Keys)
+            {
+                if (attacker.HasOverallRoleType(newType))
+                {
+                    if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.TryGetValue(newType, out announcementName))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            string cassie;
+            string subs;
+            CustomAnnouncement announcement;
+            if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationCassieAnnouncements.TryGetValue(announcementName, out announcement))
+            {
+                return;
+            }
+
+            cassie = announcement.Words;
+            subs = announcement.Translation;
+            foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.Keys)
+            {
+                if (victim.HasOverallRoleType(newType))
+                {
+                    Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.TryGetValue(newType, out subjectName);
+                }
+            }
+
+            if (subjectName is null)
+            {
+                return;
+            }
+
+            cassie = cassie.Replace("%subject%", subjectName.Words);
+            subs = subs.Replace("%subject%", subjectName.Translation);
+
+            // Make sure unit name is not empty.
+            if (!string.IsNullOrWhiteSpace(attacker.UnitName) && NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule))
+            {
+                cassie = cassie.Replace("%division%", rule.TranslateToCassie(attacker.UnitName));
+                subs = subs.Replace("%division%", attacker.UnitName);
+            }
+            else
+            {
+                cassie = cassie.Replace("%division%", "unknown");
+                subs = subs.Replace("%division%", "UNKNOWN");
+            }
+
+            Cassie.MessageTranslated(cassie, subs);
         }
     }
 }

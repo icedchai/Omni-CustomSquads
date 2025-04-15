@@ -1,4 +1,4 @@
-﻿namespace Omni_CustomSquads
+﻿namespace Omni_CustomSquads.Configs
 {
     using System;
     using System.Collections.Generic;
@@ -33,5 +33,7 @@
         {
             new CustomSquad(),
         };
+
+        public CustomTerminationAnnouncementConfig CustomTerminationAnnouncementConfig { get; set; } = new ();
     }
 }

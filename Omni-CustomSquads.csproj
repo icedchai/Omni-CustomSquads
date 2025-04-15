@@ -94,7 +94,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.cs" />
+    <Compile Include="Configs\CustomTerminationAnnouncementConfig.cs" />
+    <Compile Include="Configs\Config.cs" />
     <Compile Include="EventHandlers\CustomSquad.cs" />
     <Compile Include="EventHandlers\SquadEventHandler.cs" />
     <Compile Include="ForceWaveCommand.cs" />

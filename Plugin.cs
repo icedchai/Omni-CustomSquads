@@ -10,6 +10,7 @@
     using Exiled.API.Features;
     using Exiled.Events.Handlers;
     using Omni_CustomSquads.EventHandlers;
+    using Omni_CustomSquads.Configs;
     using PlayerRoles;
 
     /// <summary>
@@ -60,12 +61,7 @@
 
             Singleton = this;
 
-            Log.Debug("Tested");
-
-            if (Config.CustomSquads.Count == 0)
-            {
-                return;
-            }
+            Log.Debug($"{Config.CustomSquads.Count}");
 
             CustomSquad vanilla = new CustomSquad { SquadName = VanillaSquad, UseCassieAnnouncement = true };
 
@@ -82,13 +78,8 @@
             for (int i = 0; i < Config.CustomSquads.Count; i++)
             {
                 CustomSquad squad = Config.CustomSquads[i];
-                if (squad.SpawnChance == 0)
-                {
-                    continue;
-                }
 
                 squad.SquadName = squad.SquadName.ToLower();
-                // Shouldn't cause any issues unless the user has typed an infinite amount of the same squad...
                 switch (squad.SquadType.GetFaction())
                 {
                     case Faction.FoundationStaff:

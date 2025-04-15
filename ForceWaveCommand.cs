@@ -41,7 +41,7 @@
                 response = "List of available squads:";
                 foreach (CustomSquad crew in SquadEventHandler.RegisteredSquads)
                 {
-                    response += $"\n{crew.SquadName}";
+                    response += $"\n{crew.SquadName}, {crew.SquadType}, {crew.SpawnChance} chance";
                 }
 
                 if (Plugin.NextWaveNtf is null)
