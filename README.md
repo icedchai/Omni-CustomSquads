@@ -4,8 +4,8 @@
 
 **Contact icedchqi on Discord for any issues, questions, or concerns.**
 
-## ColdWaterLibrary
-ColdWaterLibrary is a revamped version of another plugin that was previously part of Omni-2 plugins.
+## [ColdWaterLibrary](https://github.com/icedchai/ColdWaterLibrary/releases)
+[ColdWaterLibrary](https://github.com/icedchai/ColdWaterLibrary/releases) is a revamped version of another plugin that was previously part of Omni-2 plugins.
 
 It contains one important class, *OverallRoleType*, which is critical but simple to understand.
 
