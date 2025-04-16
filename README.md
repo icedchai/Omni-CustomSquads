@@ -1,6 +1,7 @@
 # Omni-CustomSquads
  Omni Custom Squads as a Standalone plugin!
 
+It has custom termination announcements, custom squads with custom CASSIE announcements, the ability to add chance-based spawnwaves, and the ability to force spawnwaves!
 
 **Contact icedchqi on Discord for any issues, questions, or concerns.**
 
