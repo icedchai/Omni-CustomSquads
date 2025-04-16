@@ -95,6 +95,8 @@
                 Log.Info($"{squad.SquadName} registered under id {i}");
             }
 
+            Exiled.Events.Handlers.Map.AnnouncingScpTermination += SquadEventHandler.OnAnnouncingScpTermination;
+            Exiled.Events.Handlers.Player.Dying += SquadEventHandler.OnDying;
             Exiled.Events.Handlers.Map.AnnouncingChaosEntrance += SquadEventHandler.OnChaosAnnouncing;
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += SquadEventHandler.OnNtfAnnouncing;
             Exiled.Events.Handlers.Server.RespawningTeam += SquadEventHandler.OnSpawnWave;
@@ -104,6 +106,8 @@
         public override void OnDisabled()
         {
             base.OnDisabled();
+            Exiled.Events.Handlers.Map.AnnouncingScpTermination -= SquadEventHandler.OnAnnouncingScpTermination;
+            Exiled.Events.Handlers.Player.Dying -= SquadEventHandler.OnDying;
             Exiled.Events.Handlers.Map.AnnouncingChaosEntrance -= SquadEventHandler.OnChaosAnnouncing;
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= SquadEventHandler.OnNtfAnnouncing;
             Exiled.Events.Handlers.Server.RespawningTeam -= SquadEventHandler.OnSpawnWave;

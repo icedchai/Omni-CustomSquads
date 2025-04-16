@@ -9,6 +9,7 @@
     using ColdWaterLibrary.Types;
     using Exiled.API.Features;
     using Exiled.Events.EventArgs.Map;
+    using Exiled.Events.EventArgs.Player;
     using Exiled.Events.EventArgs.Server;
     using MEC;
     using PlayerRoles;
@@ -250,6 +251,17 @@
             e.IsAllowed = false;
         }
 
+        /// <summary>
+        /// Event handler for DyingEvent.
+        /// </summary>
+        /// <param name="e">The event args.</param>
+        public static void OnDying(DyingEventArgs e)
+        {
+            if (Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.IsEnabled)
+            {
+                AnnounceSubjectDeath(e.Attacker, e.Player);
+            }
+        }
 
         /// <summary>
         /// Announces a subject's death.
