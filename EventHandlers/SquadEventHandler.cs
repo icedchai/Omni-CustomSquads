@@ -273,6 +273,11 @@
             CustomAnnouncement subjectName = null;
             if (attacker is null)
             {
+                if (victim is null)
+                {
+                    return;
+                }
+
                 foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.Keys)
                 {
                     if (victim.HasOverallRoleType(newType))
