@@ -2,12 +2,14 @@
  Omni Custom Squads as a Standalone plugin!
 
 
-## Omni Common Library
-Omni-CommonLibrary is a small class library that features a couple of extensions & works as a main hub for generalized things I make for these plugins.
+**Contact icedchqi on Discord for any issues, questions, or concerns.**
+
+## ColdWaterLibrary
+ColdWaterLibrary is a revamped version of another plugin that was previously part of Omni-2 plugins.
 
 It contains one important class, *OverallRoleType*, which is critical but simple to understand.
 
-The `RoleType` field can be one of three values: `BaseGameRole`, `CrRole` (EXILED Custom Role), or `UcrRole` (UncomplicatedCustomRoles).
+The `RoleType` field can be one of three values: `BaseGame`, `ExiledCustom` (EXILED Custom Role), or `Uncomplicated` (UncomplicatedCustomRoles).
 
 The `RoleId` field can be any integer, which corresponds to the ID of the role in its respective system (BaseGame, EXILED Customrole, UCR). The `BaseGameRole` ID system can be found below.
 ```
@@ -45,11 +47,11 @@ The `RoleId` field can be any integer, which corresponds to the ID of the role i
 An example `OverallRoleType` corresponding to the Scientist class:
 ```
   role_id: 6
-  role_type: BaseGameRole
+  role_type: BaseGame
 ```
 Another example `OverallRoleType` corresponding to a UCR role with its ID set to 22:
 ```
   role_id: 22
-  role_type: UcrRole
+  role_type: Uncomplicated
 ```
 If there are any questions, do not be afraid to send me a DM!
