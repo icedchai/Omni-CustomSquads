@@ -24,7 +24,12 @@
         public bool Debug { get; set; } = false;
 
         public int CiVanillaChance { get; set; } = 100;
+
         public int NtfVanillaChance { get; set; } = 100;
+
+        public int CiMiniVanillaChance { get; set; } = 100;
+
+        public int NtfMiniVanillaChance { get; set; } = 100;
 
         /// <summary>
         /// Gets or sets the list of <see cref="CustomSquad"/> to be registered.

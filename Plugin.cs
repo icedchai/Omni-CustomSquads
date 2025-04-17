@@ -75,17 +75,33 @@
                 SquadEventHandler.NtfPool.AddEntry(vanilla, Config.NtfVanillaChance);
             }
 
+            if (Config.CiMiniVanillaChance > 0)
+            {
+                SquadEventHandler.CiMiniPool.AddEntry(vanilla, Config.CiMiniVanillaChance);
+            }
+
+            if (Config.NtfMiniVanillaChance > 0)
+            {
+                SquadEventHandler.NtfMiniPool.AddEntry(vanilla, Config.NtfMiniVanillaChance);
+            }
+
             for (int i = 0; i < Config.CustomSquads.Count; i++)
             {
                 CustomSquad squad = Config.CustomSquads[i];
 
                 squad.SquadName = squad.SquadName.ToLower();
-                switch (squad.SquadType.GetFaction())
+                switch (squad.SquadType)
                 {
-                    case Faction.FoundationStaff:
+                    case SpawnableFaction.NtfWave:
                         SquadEventHandler.NtfPool.AddEntry(squad, squad.SpawnChance);
                         break;
-                    case Faction.FoundationEnemy:
+                    case SpawnableFaction.ChaosWave:
+                        SquadEventHandler.CiPool.AddEntry(squad, squad.SpawnChance);
+                        break;
+                    case SpawnableFaction.NtfMiniWave:
+                        SquadEventHandler.NtfPool.AddEntry(squad, squad.SpawnChance);
+                        break;
+                    case SpawnableFaction.ChaosMiniWave:
                         SquadEventHandler.CiPool.AddEntry(squad, squad.SpawnChance);
                         break;
                 }

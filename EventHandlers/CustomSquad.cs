@@ -18,19 +18,17 @@
         /// <summary>
         /// Gets or sets a value indicating whether to make a CASSIE announcement upon this unit's arrival.
         /// </summary>
-        [Description("Whether to make a CASSIE announcement")]
         public bool UseCassieAnnouncement { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the squad name.
         /// </summary>
-        [Description("Name used to refer to the squad in commands and logs")]
         public string SquadName { get; set; } = "delta4";
 
         /// <summary>
         /// Gets or sets the spawn wave this replaces.
         /// </summary>
-        [Description("Respawn wave this will replace. Use NtfWave to get the NATO divisions (Juliett-15), and ChaosWave to not.")]
+        [Description("Respawn wave this will replace. Use NtfWave (or NtfMiniWave) to get the NATO divisions (Juliett-15), and ChaosWave (or ChaosMiniWave) to not. Use miniwave if you want this to replace an existing wave.")]
         public SpawnableFaction SquadType { get; set; } = SpawnableFaction.NtfWave;
 
         [Description("Chance this squad spawns instead of vanilla, or the other squads. Added up with vanilla spawn chance and other squad spawn chances.")]
@@ -39,7 +37,6 @@
         /// <summary>
         /// Gets or sets the CASSIE announcement this squad will use.
         /// </summary>
-        [Description("Announcement CASSIE will say when the custom squad enters")]
         public string EntranceAnnouncement { get; set; } = "mtfunit delta 4 designated minute men division %division% hasentered";
 
         /// <summary>

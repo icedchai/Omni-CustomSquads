@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using ColdWaterLibrary.Extensions;
     using ColdWaterLibrary.Types;
+    using Exiled.API.Enums;
     using Exiled.API.Features;
     using Exiled.Events.EventArgs.Map;
     using Exiled.Events.EventArgs.Player;
@@ -62,8 +63,11 @@
         internal static SquadPool NtfPool { get; set; } = new SquadPool();
 
         internal static SquadPool CiPool { get; set; } = new SquadPool();
+        internal static SquadPool NtfMiniPool { get; set; } = new SquadPool();
 
-        public static List<CustomSquad> RegisteredSquads => NtfPool.RegisteredSquads.Concat(CiPool.RegisteredSquads).ToList();
+        internal static SquadPool CiMiniPool { get; set; } = new SquadPool();
+
+        public static List<CustomSquad> RegisteredSquads => NtfPool.RegisteredSquads.Concat(CiPool.RegisteredSquads).Concat(CiMiniPool.RegisteredSquads).Concat(NtfMiniPool.RegisteredSquads).ToList();
 
         /// <summary>
         /// Event handler for SpawningTeamVehicleEvent.
@@ -194,9 +198,9 @@
             }
 
             Log.Debug("bb");
-            switch (e.NextKnownTeam)
+            switch (e.Wave.SpawnableFaction)
             {
-                case Faction.FoundationEnemy:
+                case SpawnableFaction.ChaosWave:
                     {
                         customSquad = Plugin.NextWaveCi;
                         if (customSquad is null)
@@ -213,13 +217,47 @@
                         break;
                     }
 
-                case Faction.FoundationStaff:
+                case SpawnableFaction.NtfWave:
                     {
                         customSquad = Plugin.NextWaveNtf;
 
                         if (customSquad is null)
                         {
                             Plugin.NextWaveNtf = NtfPool.GetRandomSquad();
+                            customSquad = Plugin.NextWaveNtf;
+                            if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
+                            {
+                                return;
+                            }
+                        }
+
+                        HandleSpawnWave(customSquad, players);
+                        break;
+                    }
+                case SpawnableFaction.ChaosMiniWave:
+                    {
+                        customSquad = Plugin.NextWaveCi;
+                        if (customSquad is null)
+                        {
+                            Plugin.NextWaveCi = CiMiniPool.GetRandomSquad();
+                            customSquad = Plugin.NextWaveCi;
+                            if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
+                            {
+                                return;
+                            }
+                        }
+
+                        HandleSpawnWave(customSquad, e.Players);
+                        break;
+                    }
+
+                case SpawnableFaction.NtfMiniWave:
+                    {
+                        customSquad = Plugin.NextWaveNtf;
+
+                        if (customSquad is null)
+                        {
+                            Plugin.NextWaveNtf = NtfMiniPool.GetRandomSquad();
                             customSquad = Plugin.NextWaveNtf;
                             if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
                             {
