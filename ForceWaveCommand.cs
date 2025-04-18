@@ -6,6 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using CommandSystem;
+    using Exiled.API.Enums;
     using Exiled.API.Extensions;
     using Exiled.API.Features;
     using Omni_CustomSquads.EventHandlers;
@@ -36,30 +37,56 @@
                 response = "You do not have permission to use this command! Permission: PlayerPermissions.RoundEvents";
                 return false;
             }
+
             if (arguments.Count == 0)
             {
                 response = "List of available squads:";
                 foreach (CustomSquad crew in SquadEventHandler.RegisteredSquads)
                 {
+                    if (crew.SquadName == Plugin.VanillaSquad || crew is null)
+                    {
+                        continue;
+                    }
+
                     response += $"\n{crew.SquadName}, {crew.SquadType}, {crew.SpawnChance} chance";
                 }
 
                 if (Plugin.NextWaveNtf is null)
                 {
-                    response += "\nCurrent squad MTF : NONE";
+                    response += "\n<color=yellow>Current squad MTF : NONE</color>";
                 }
                 else
                 {
-                    response += $"\nCurrent squad MTF : {Plugin.NextWaveNtf.SquadName}";
+                    response += $"\n<color=yellow>Current squad MTF : {Plugin.NextWaveNtf.SquadName}</color>";
                 }
+
                 if (Plugin.NextWaveCi is null)
                 {
-                    response += "\nCurrent squad CI : NONE";
+                    response += "\n<color=yellow>Current squad CI : NONE</color>";
                 }
                 else
                 {
-                    response += $"\nCurrent squad CI : {Plugin.NextWaveCi.SquadName}";
+                    response += $"\n<color=yellow>Current squad CI : {Plugin.NextWaveCi.SquadName}</color>";
                 }
+
+                if (Plugin.NextWaveNtfMini is null)
+                {
+                    response += "\n<color=yellow>Current squad MTFMini : NONE</color>";
+                }
+                else
+                {
+                    response += $"\n<color=yellow>Current squad MTFMini : {Plugin.NextWaveNtf.SquadName}</color>";
+                }
+
+                if (Plugin.NextWaveCiMini is null)
+                {
+                    response += "\n<color=yellow>Current squad CIMini : NONE</color>";
+                }
+                else
+                {
+                    response += $"\n<color=yellow>Current squad CIMini : {Plugin.NextWaveCi.SquadName}</color>";
+                }
+
                 return false;
             }
 
@@ -71,15 +98,25 @@
             }
 
             CustomSquad customSquad = SquadEventHandler.RegisteredSquads.Where(s => s.SquadName == arg0).FirstOrDefault();
-            if (customSquad.SquadType.GetFaction() == Faction.FoundationStaff)
+            if (customSquad.SquadType == SpawnableFaction.NtfWave)
             {
                 Plugin.NextWaveNtf = customSquad;
                 response = $"Set next MTF Spawnwave to {arg0}";
             }
-            else if (customSquad.SquadType.GetFaction() == Faction.FoundationEnemy)
+            else if (customSquad.SquadType == SpawnableFaction.ChaosWave)
             {
                 Plugin.NextWaveCi = customSquad;
                 response = $"Set next CI Spawnwave to {arg0}";
+            }
+            else if (customSquad.SquadType == SpawnableFaction.NtfMiniWave)
+            {
+                Plugin.NextWaveNtfMini = customSquad;
+                response = $"Set next MTF Miniwave to {arg0}";
+            }
+            else if (customSquad.SquadType == SpawnableFaction.ChaosMiniWave)
+            {
+                Plugin.NextWaveCiMini = customSquad;
+                response = $"Set next CI Miniwave to {arg0}";
             }
             else
             {

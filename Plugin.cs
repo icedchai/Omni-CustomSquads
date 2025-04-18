@@ -32,6 +32,7 @@
         /// Gets the <see cref="Singleton"/>'s config.
         /// </summary>
         public static Config config => Singleton.Config;
+
         /// <summary>
         /// Gets the next CustomSquad set to spawn.
         /// </summary>
@@ -41,6 +42,15 @@
         /// Gets the next CustomSquad set to spawn.
         /// </summary>
         public static CustomSquad NextWaveCi { get; internal set; }
+        /// <summary>
+        /// Gets the next CustomSquad set to spawn.
+        /// </summary>
+        public static CustomSquad NextWaveNtfMini { get; internal set; }
+
+        /// <summary>
+        /// Gets the next CustomSquad set to spawn.
+        /// </summary>
+        public static CustomSquad NextWaveCiMini { get; internal set; }
 
         /// <inheritdoc/>
         public override string Name => "Omni Custom Squads";
