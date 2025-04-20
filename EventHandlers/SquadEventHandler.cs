@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using ColdWaterLibrary.Extensions;
     using ColdWaterLibrary.Types;
+    using Exiled.API.Enums;
     using Exiled.API.Features;
     using Exiled.Events.EventArgs.Map;
     using Exiled.Events.EventArgs.Player;
@@ -63,7 +64,11 @@
 
         internal static SquadPool CiPool { get; set; } = new SquadPool();
 
-        public static List<CustomSquad> RegisteredSquads => NtfPool.RegisteredSquads.Concat(CiPool.RegisteredSquads).ToList();
+        internal static SquadPool NtfMiniPool { get; set; } = new SquadPool();
+
+        internal static SquadPool CiMiniPool { get; set; } = new SquadPool();
+
+        public static List<CustomSquad> RegisteredSquads => NtfPool.RegisteredSquads.Concat(CiPool.RegisteredSquads).Concat(CiMiniPool.RegisteredSquads).Concat(NtfMiniPool.RegisteredSquads).ToList();
 
         /// <summary>
         /// Event handler for SpawningTeamVehicleEvent.
@@ -71,7 +76,8 @@
         /// <param name="e">The event args.</param>
         public static void OnTeamVehicleSpawning(SpawningTeamVehicleEventArgs e)
         {
-            if (e.Team.TargetFaction == Faction.FoundationStaff)
+            // TODO: Fix this.
+            /*if (e.Team.TargetFaction == Faction.FoundationStaff)
             {
                 if (Plugin.NextWaveNtf is null)
                 {
@@ -98,7 +104,7 @@
                 }
 
                 e.IsAllowed = false;
-            }
+            }*/
         }
 
         /// <summary>
@@ -107,16 +113,30 @@
         /// <param name="e">The event args.</param>
         public static void OnChaosAnnouncing(AnnouncingChaosEntranceEventArgs e)
         {
-            Log.Debug("Announcing CHAOS ENTRANCE");
-            if (Plugin.NextWaveCi is null || Plugin.NextWaveCi.SquadName == Plugin.VanillaSquad)
+
+            if (e.Wave.IsMiniWave)
             {
+                if (Plugin.NextWaveCiMini is null || Plugin.NextWaveCiMini.SquadName == Plugin.VanillaSquad)
+                {
+                    return;
+                }
+
+                Log.Debug("Announcing Ci ENTRANCE: Custom Squad Detected");
+                Plugin.NextWaveCiMini = null;
+                e.IsAllowed = false;
                 return;
             }
+            else
+            {
+                if (Plugin.NextWaveCi is null || Plugin.NextWaveCi.SquadName == Plugin.VanillaSquad)
+                {
+                    return;
+                }
 
-            Log.Debug("Announcing CHAOS ENTRANCE: Custom Squad Detected");
-            // Timing.CallDelayed(0.01f, Cassie.Clear);
-            Plugin.NextWaveCi = null;
-            e.IsAllowed = false;
+                Log.Debug("Announcing Ci ENTRANCE: Custom Squad Detected");
+                Plugin.NextWaveCi = null;
+                e.IsAllowed = false;
+            }
         }
 
         /// <summary>
@@ -126,15 +146,30 @@
         public static void OnNtfAnnouncing(AnnouncingNtfEntranceEventArgs e)
         {
             Log.Debug("Announcing NTF ENTRANCE");
-            if (Plugin.NextWaveNtf is null || Plugin.NextWaveNtf.SquadName == Plugin.VanillaSquad)
+
+            if (e.Wave.IsMiniWave)
             {
-                Plugin.NextWaveNtf = null;
+                if (Plugin.NextWaveNtfMini is null || Plugin.NextWaveNtfMini.SquadName == Plugin.VanillaSquad)
+                {
+                    return;
+                }
+
+                Log.Debug("Announcing NTF ENTRANCE: Custom Squad Detected");
+                Plugin.NextWaveNtfMini = null;
+                e.IsAllowed = false;
                 return;
             }
+            else
+            {
+                if (Plugin.NextWaveNtf is null || Plugin.NextWaveNtf.SquadName == Plugin.VanillaSquad)
+                {
+                    return;
+                }
 
-            Log.Debug("Announcing NTF ENTRANCE: Custom Squad Detected");
-            Plugin.NextWaveNtf = null;
-            e.IsAllowed = false;
+                Log.Debug("Announcing NTF ENTRANCE: Custom Squad Detected");
+                Plugin.NextWaveNtf = null;
+                e.IsAllowed = false;
+            }
         }
 
         private static void HandleSpawnWave(CustomSquad customSquad, List<Player> players)
@@ -173,6 +208,7 @@
                         announcement = announcement.Replace("%division%", rule.TranslateToCassie(rule.LastGeneratedName));
                         announcementSubs = announcementSubs.Replace("%division%", rule.LastGeneratedName);
                     }
+
                     Cassie.MessageTranslated(announcement, announcementSubs);
                 });
             }
@@ -189,21 +225,19 @@
             Queue<RoleTypeId> queue = e.SpawnQueue;
             if (players.Count == 0)
             {
-                Log.Debug("aa");
                 return;
             }
 
-            Log.Debug("bb");
-            switch (e.NextKnownTeam)
+            switch (e.Wave.SpawnableFaction)
             {
-                case Faction.FoundationEnemy:
+                case SpawnableFaction.ChaosWave:
                     {
                         customSquad = Plugin.NextWaveCi;
                         if (customSquad is null)
                         {
                             Plugin.NextWaveCi = CiPool.GetRandomSquad();
                             customSquad = Plugin.NextWaveCi;
-                            if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
+                            if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
                             }
@@ -213,7 +247,7 @@
                         break;
                     }
 
-                case Faction.FoundationStaff:
+                case SpawnableFaction.NtfWave:
                     {
                         customSquad = Plugin.NextWaveNtf;
 
@@ -221,7 +255,42 @@
                         {
                             Plugin.NextWaveNtf = NtfPool.GetRandomSquad();
                             customSquad = Plugin.NextWaveNtf;
-                            if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
+                            if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
+                            {
+                                return;
+                            }
+                        }
+
+                        HandleSpawnWave(customSquad, players);
+                        break;
+                    }
+
+                case SpawnableFaction.ChaosMiniWave:
+                    {
+                        customSquad = Plugin.NextWaveCiMini;
+                        if (customSquad is null)
+                        {
+                            Plugin.NextWaveCiMini = CiMiniPool.GetRandomSquad();
+                            customSquad = Plugin.NextWaveCiMini;
+                            if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
+                            {
+                                return;
+                            }
+                        }
+
+                        HandleSpawnWave(customSquad, e.Players);
+                        break;
+                    }
+
+                case SpawnableFaction.NtfMiniWave:
+                    {
+                        customSquad = Plugin.NextWaveNtfMini;
+
+                        if (customSquad is null)
+                        {
+                            Plugin.NextWaveNtfMini = NtfMiniPool.GetRandomSquad();
+                            customSquad = Plugin.NextWaveNtfMini;
+                            if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
                             }
