@@ -62,7 +62,7 @@
         public override string Prefix => "omni_customsquads";
 
         /// <inheritdoc/>
-        public override Version Version => new Version(1, 1, 0);
+        public override Version Version => new Version(1, 1, 1);
 
         /// <inheritdoc/>
         public override void OnEnabled()
