@@ -109,10 +109,10 @@
                         SquadEventHandler.CiPool.AddEntry(squad, squad.SpawnChance);
                         break;
                     case SpawnableFaction.NtfMiniWave:
-                        SquadEventHandler.NtfPool.AddEntry(squad, squad.SpawnChance);
+                        SquadEventHandler.NtfMiniPool.AddEntry(squad, squad.SpawnChance);
                         break;
                     case SpawnableFaction.ChaosMiniWave:
-                        SquadEventHandler.CiPool.AddEntry(squad, squad.SpawnChance);
+                        SquadEventHandler.CiMiniPool.AddEntry(squad, squad.SpawnChance);
                         break;
                 }
 

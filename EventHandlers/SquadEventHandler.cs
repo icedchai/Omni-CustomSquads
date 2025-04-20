@@ -237,7 +237,7 @@
                         {
                             Plugin.NextWaveCi = CiPool.GetRandomSquad();
                             customSquad = Plugin.NextWaveCi;
-                            if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
+                            if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
                             }
@@ -255,7 +255,7 @@
                         {
                             Plugin.NextWaveNtf = NtfPool.GetRandomSquad();
                             customSquad = Plugin.NextWaveNtf;
-                            if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
+                            if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
                             }
@@ -272,7 +272,7 @@
                         {
                             Plugin.NextWaveCiMini = CiMiniPool.GetRandomSquad();
                             customSquad = Plugin.NextWaveCiMini;
-                            if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
+                            if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
                             }
@@ -290,7 +290,7 @@
                         {
                             Plugin.NextWaveNtfMini = NtfMiniPool.GetRandomSquad();
                             customSquad = Plugin.NextWaveNtfMini;
-                            if (customSquad.SquadName == Plugin.VanillaSquad || customSquad is null)
+                            if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
                             }
