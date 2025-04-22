@@ -15,66 +15,41 @@
     using MEC;
     using PlayerRoles;
     using Respawning.NamingRules;
+    using Utils;
 
-    public static class SquadEventHandler
+    public class SquadEventHandler
     {
+        private SquadManager SquadManager => SquadManager.Singleton;
+
         /// <summary>
-        /// Squad chance pool.
+        /// Registers events.
         /// </summary>
-        internal class SquadPool
+        public void RegisterEvents()
         {
-            private Dictionary<CustomSquad, int> entries = new();
-            private int accumulatedWeight = 0;
-
-            /// <summary>
-            /// Clears entries.
-            /// </summary>
-            public void ClearEntries()
-            {
-                entries.Clear();
-            }
-
-            public List<CustomSquad> RegisteredSquads => entries.Keys.ToList();
-
-            public void AddEntry(CustomSquad customSquad, int weight)
-            {
-                accumulatedWeight += weight;
-                customSquad.SquadName = customSquad.SquadName.ToLower();
-
-                entries.Add(customSquad, accumulatedWeight);
-            }
-
-            public CustomSquad GetRandomSquad()
-            {
-                float r = UnityEngine.Random.Range(0.01f, 1f) * accumulatedWeight;
-
-                for (int i = 0; i < entries.Count; i++)
-                {
-                    if (entries.Values.ToList()[i] >= r)
-                    {
-                        return entries.Keys.ToList()[i];
-                    }
-                }
-
-                return null; // should only happen when there are no entries
-            }
+            Exiled.Events.Handlers.Map.AnnouncingScpTermination += OnAnnouncingScpTermination;
+            Exiled.Events.Handlers.Player.Dying += OnDying;
+            Exiled.Events.Handlers.Map.AnnouncingChaosEntrance += OnChaosAnnouncing;
+            Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += OnNtfAnnouncing;
+            Exiled.Events.Handlers.Server.RespawningTeam += OnSpawnWave;
         }
 
-        internal static SquadPool NtfPool { get; set; } = new SquadPool();
-
-        internal static SquadPool CiPool { get; set; } = new SquadPool();
-
-        internal static SquadPool NtfMiniPool { get; set; } = new SquadPool();
-
-        internal static SquadPool CiMiniPool { get; set; } = new SquadPool();
-
-        public static List<CustomSquad> RegisteredSquads => NtfPool.RegisteredSquads.Concat(CiPool.RegisteredSquads).Concat(CiMiniPool.RegisteredSquads).Concat(NtfMiniPool.RegisteredSquads).ToList();
+        /// <summary>
+        /// Unregisters events.
+        /// </summary>
+        public void UnregisterEvents()
+        {
+            Exiled.Events.Handlers.Map.AnnouncingScpTermination -= OnAnnouncingScpTermination;
+            Exiled.Events.Handlers.Player.Dying -= OnDying;
+            Exiled.Events.Handlers.Map.AnnouncingChaosEntrance -= OnChaosAnnouncing;
+            Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= OnNtfAnnouncing;
+            Exiled.Events.Handlers.Server.RespawningTeam -= OnSpawnWave;
+        }
 
         /// <summary>
         /// Event handler for SpawningTeamVehicleEvent.
         /// </summary>
         /// <param name="e">The event args.</param>
-        public static void OnTeamVehicleSpawning(SpawningTeamVehicleEventArgs e)
+        private void OnTeamVehicleSpawning(SpawningTeamVehicleEventArgs e)
         {
             // TODO: Fix this.
             /*if (e.Team.TargetFaction == Faction.FoundationStaff)
@@ -111,30 +86,30 @@
         /// Event handler for AnnouncingChaosEntranceEvent.
         /// </summary>
         /// <param name="e">The event args.</param>
-        public static void OnChaosAnnouncing(AnnouncingChaosEntranceEventArgs e)
+        private void OnChaosAnnouncing(AnnouncingChaosEntranceEventArgs e)
         {
 
             if (e.Wave.IsMiniWave)
             {
-                if (Plugin.NextWaveCiMini is null || Plugin.NextWaveCiMini.SquadName == Plugin.VanillaSquad)
+                if (SquadManager.NextWaveCiMini is null || SquadManager.NextWaveCiMini.SquadName == Plugin.VanillaSquad)
                 {
                     return;
                 }
 
                 Log.Debug("Announcing Ci ENTRANCE: Custom Squad Detected");
-                Plugin.NextWaveCiMini = null;
+                SquadManager.NextWaveCiMini = null;
                 e.IsAllowed = false;
                 return;
             }
             else
             {
-                if (Plugin.NextWaveCi is null || Plugin.NextWaveCi.SquadName == Plugin.VanillaSquad)
+                if (SquadManager.NextWaveCi is null || SquadManager.NextWaveCi.SquadName == Plugin.VanillaSquad)
                 {
                     return;
                 }
 
                 Log.Debug("Announcing Ci ENTRANCE: Custom Squad Detected");
-                Plugin.NextWaveCi = null;
+                SquadManager.NextWaveCi = null;
                 e.IsAllowed = false;
             }
         }
@@ -143,36 +118,36 @@
         /// Event handler for AnnouncingNtfEntranceEvent.
         /// </summary>
         /// <param name="e">The event args.</param>
-        public static void OnNtfAnnouncing(AnnouncingNtfEntranceEventArgs e)
+        private void OnNtfAnnouncing(AnnouncingNtfEntranceEventArgs e)
         {
             Log.Debug("Announcing NTF ENTRANCE");
 
             if (e.Wave.IsMiniWave)
             {
-                if (Plugin.NextWaveNtfMini is null || Plugin.NextWaveNtfMini.SquadName == Plugin.VanillaSquad)
+                if (SquadManager.NextWaveNtfMini is null || SquadManager.NextWaveNtfMini.SquadName == Plugin.VanillaSquad)
                 {
                     return;
                 }
 
                 Log.Debug("Announcing NTF ENTRANCE: Custom Squad Detected");
-                Plugin.NextWaveNtfMini = null;
+                SquadManager.NextWaveNtfMini = null;
                 e.IsAllowed = false;
                 return;
             }
             else
             {
-                if (Plugin.NextWaveNtf is null || Plugin.NextWaveNtf.SquadName == Plugin.VanillaSquad)
+                if (SquadManager.NextWaveNtf is null || SquadManager.NextWaveNtf.SquadName == Plugin.VanillaSquad)
                 {
                     return;
                 }
 
                 Log.Debug("Announcing NTF ENTRANCE: Custom Squad Detected");
-                Plugin.NextWaveNtf = null;
+                SquadManager.NextWaveNtf = null;
                 e.IsAllowed = false;
             }
         }
 
-        private static void HandleSpawnWave(CustomSquad customSquad, List<Player> players)
+        private void HandleSpawnWave(CustomSquad customSquad, List<Player> players)
         {
             foreach (char c in customSquad.SpawnQueue)
             {
@@ -218,7 +193,7 @@
         /// Event handler for RespawningTeamEventArgs.
         /// </summary>
         /// <param name="e">The event args.</param>
-        public static void OnSpawnWave(RespawningTeamEventArgs e)
+        private void OnSpawnWave(RespawningTeamEventArgs e)
         {
             CustomSquad customSquad;
             List<Player> players = e.Players;
@@ -232,11 +207,11 @@
             {
                 case SpawnableFaction.ChaosWave:
                     {
-                        customSquad = Plugin.NextWaveCi;
+                        customSquad = SquadManager.NextWaveCi;
                         if (customSquad is null)
                         {
-                            Plugin.NextWaveCi = CiPool.GetRandomSquad();
-                            customSquad = Plugin.NextWaveCi;
+                            SquadManager.NextWaveCi = SquadManager.CiPool.GetRandomSquad();
+                            customSquad = SquadManager.NextWaveCi;
                             if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
@@ -249,12 +224,12 @@
 
                 case SpawnableFaction.NtfWave:
                     {
-                        customSquad = Plugin.NextWaveNtf;
+                        customSquad = SquadManager.NextWaveNtf;
 
                         if (customSquad is null)
                         {
-                            Plugin.NextWaveNtf = NtfPool.GetRandomSquad();
-                            customSquad = Plugin.NextWaveNtf;
+                            SquadManager.NextWaveNtf = SquadManager.NtfPool.GetRandomSquad();
+                            customSquad = SquadManager.NextWaveNtf;
                             if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
@@ -267,11 +242,11 @@
 
                 case SpawnableFaction.ChaosMiniWave:
                     {
-                        customSquad = Plugin.NextWaveCiMini;
+                        customSquad = SquadManager.NextWaveCiMini;
                         if (customSquad is null)
                         {
-                            Plugin.NextWaveCiMini = CiMiniPool.GetRandomSquad();
-                            customSquad = Plugin.NextWaveCiMini;
+                            SquadManager.NextWaveCiMini = SquadManager.CiMiniPool.GetRandomSquad();
+                            customSquad = SquadManager.NextWaveCiMini;
                             if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
@@ -284,12 +259,12 @@
 
                 case SpawnableFaction.NtfMiniWave:
                     {
-                        customSquad = Plugin.NextWaveNtfMini;
+                        customSquad = SquadManager.NextWaveNtfMini;
 
                         if (customSquad is null)
                         {
-                            Plugin.NextWaveNtfMini = NtfMiniPool.GetRandomSquad();
-                            customSquad = Plugin.NextWaveNtfMini;
+                            SquadManager.NextWaveNtfMini = SquadManager.NtfMiniPool.GetRandomSquad();
+                            customSquad = SquadManager.NextWaveNtfMini;
                             if (customSquad is null || customSquad.SquadName == Plugin.VanillaSquad)
                             {
                                 return;
@@ -309,7 +284,7 @@
         /// Event handler for AnnouncingScpTerminationEvent.
         /// </summary>
         /// <param name="e">The event args.</param>
-        public static void OnAnnouncingScpTermination(AnnouncingScpTerminationEventArgs e)
+        private void OnAnnouncingScpTermination(AnnouncingScpTerminationEventArgs e)
         {
             if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.IsEnabled)
             {
@@ -324,7 +299,7 @@
         /// Event handler for DyingEvent.
         /// </summary>
         /// <param name="e">The event args.</param>
-        public static void OnDying(DyingEventArgs e)
+        private void OnDying(DyingEventArgs e)
         {
             if (Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.IsEnabled)
             {
@@ -337,21 +312,28 @@
         /// </summary>
         /// <param name="attacker">The player who killed the victim.</param>
         /// <param name="victim">The player whose death is being announced.</param>
-        public static void AnnounceSubjectDeath(Player attacker, Player victim)
+        private void AnnounceSubjectDeath(Player attacker, Player victim)
         {
             CustomAnnouncement subjectName = null;
+            if (victim is null)
+            {
+                return;
+            }
+
             if (attacker is null)
             {
-                if (victim is null)
-                {
-                    return;
-                }
-
                 foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.Keys)
                 {
                     if (victim.HasOverallRoleType(newType))
                     {
-                        Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.TryGetValue(newType, out subjectName);
+                        if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.TryGetValue(newType, out subjectName))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
 
@@ -391,7 +373,14 @@
             {
                 if (victim.HasOverallRoleType(newType))
                 {
-                    Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.TryGetValue(newType, out subjectName);
+                    if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.TryGetValue(newType, out subjectName))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
 

@@ -97,6 +97,7 @@
     <Compile Include="ForceWaveCommand.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SquadManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
