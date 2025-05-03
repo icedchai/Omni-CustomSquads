@@ -93,6 +93,7 @@
             {
                 if (SquadManager.NextWaveCiMini is null || SquadManager.NextWaveCiMini.SquadName == Plugin.VanillaSquad)
                 {
+                    SquadManager.NextWaveCiMini = null;
                     return;
                 }
 
@@ -105,6 +106,7 @@
             {
                 if (SquadManager.NextWaveCi is null || SquadManager.NextWaveCi.SquadName == Plugin.VanillaSquad)
                 {
+                    SquadManager.NextWaveCi = null;
                     return;
                 }
 
@@ -126,7 +128,7 @@
             {
                 if (SquadManager.NextWaveNtfMini is null || SquadManager.NextWaveNtfMini.SquadName == Plugin.VanillaSquad)
                 {
-                    SquadManager.NextWaveNtf = null;
+                    SquadManager.NextWaveNtfMini = null;
                     return;
                 }
 
