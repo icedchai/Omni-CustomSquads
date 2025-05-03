@@ -208,6 +208,12 @@
                 case SpawnableFaction.ChaosWave:
                     {
                         customSquad = SquadManager.NextWaveCi;
+
+                        if (customSquad.SquadName == Plugin.VanillaSquad)
+                        {
+                            return;
+                        }
+
                         if (customSquad is null)
                         {
                             SquadManager.NextWaveCi = SquadManager.CiPool.GetRandomSquad();
@@ -225,6 +231,10 @@
                 case SpawnableFaction.NtfWave:
                     {
                         customSquad = SquadManager.NextWaveNtf;
+                        if (customSquad.SquadName == Plugin.VanillaSquad)
+                        {
+                            return;
+                        }
 
                         if (customSquad is null)
                         {
@@ -243,6 +253,12 @@
                 case SpawnableFaction.ChaosMiniWave:
                     {
                         customSquad = SquadManager.NextWaveCiMini;
+
+                        if (customSquad.SquadName == Plugin.VanillaSquad)
+                        {
+                            return;
+                        }
+
                         if (customSquad is null)
                         {
                             SquadManager.NextWaveCiMini = SquadManager.CiMiniPool.GetRandomSquad();
