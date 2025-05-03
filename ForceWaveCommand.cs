@@ -18,6 +18,8 @@
     //Documented November 16th 2024
     public class ForceWaveCommand : ICommand
     {
+        private static SquadManager SquadManager => SquadManager.Singleton;
+
         public string Command { get; } = "forcecustomwave";
 
         public string[] Aliases { get; } = new[]
@@ -41,7 +43,7 @@
             if (arguments.Count == 0)
             {
                 response = "List of available squads:";
-                foreach (CustomSquad crew in SquadEventHandler.RegisteredSquads)
+                foreach (CustomSquad crew in SquadManager.RegisteredSquads)
                 {
                     if (crew.SquadName == Plugin.VanillaSquad || crew is null)
                     {
@@ -51,78 +53,77 @@
                     response += $"\n{crew.SquadName}, {crew.SquadType}, {crew.SpawnChance} chance";
                 }
 
-                if (Plugin.NextWaveNtf is null)
+                if (SquadManager.NextWaveNtf is null)
                 {
                     response += "\n<color=yellow>Current squad MTF : NONE</color>";
                 }
                 else
                 {
-                    response += $"\n<color=yellow>Current squad MTF : {Plugin.NextWaveNtf.SquadName}</color>";
+                    response += $"\n<color=yellow>Current squad MTF : {SquadManager.NextWaveNtf.SquadName}</color>";
                 }
 
-                if (Plugin.NextWaveCi is null)
+                if (SquadManager.NextWaveCi is null)
                 {
                     response += "\n<color=yellow>Current squad CI : NONE</color>";
                 }
                 else
                 {
-                    response += $"\n<color=yellow>Current squad CI : {Plugin.NextWaveCi.SquadName}</color>";
+                    response += $"\n<color=yellow>Current squad CI : {SquadManager.NextWaveCi.SquadName}</color>";
                 }
 
-                if (Plugin.NextWaveNtfMini is null)
+                if (SquadManager.NextWaveNtfMini is null)
                 {
                     response += "\n<color=yellow>Current squad MTFMini : NONE</color>";
                 }
                 else
                 {
-                    response += $"\n<color=yellow>Current squad MTFMini : {Plugin.NextWaveNtf.SquadName}</color>";
+                    response += $"\n<color=yellow>Current squad MTFMini : {SquadManager.NextWaveNtf.SquadName}</color>";
                 }
 
-                if (Plugin.NextWaveCiMini is null)
+                if (SquadManager.NextWaveCiMini is null)
                 {
                     response += "\n<color=yellow>Current squad CIMini : NONE</color>";
                 }
                 else
                 {
-                    response += $"\n<color=yellow>Current squad CIMini : {Plugin.NextWaveCi.SquadName}</color>";
+                    response += $"\n<color=yellow>Current squad CIMini : {SquadManager.NextWaveCi.SquadName}</color>";
                 }
 
                 return false;
             }
 
             string arg0 = arguments.At(0).ToLower();
-            if (!SquadEventHandler.RegisteredSquads.Where(s => s.SquadName == arg0).Any())
+            if (!SquadManager.RegisteredSquads.Where(s => s.SquadName == arg0).Any())
             {
                 response = "Please input a squad";
                 return false;
             }
 
-            CustomSquad customSquad = SquadEventHandler.RegisteredSquads.Where(s => s.SquadName == arg0).FirstOrDefault();
-            if (customSquad.SquadType == SpawnableFaction.NtfWave)
-            {
-                Plugin.NextWaveNtf = customSquad;
-                response = $"Set next MTF Spawnwave to {arg0}";
-            }
-            else if (customSquad.SquadType == SpawnableFaction.ChaosWave)
-            {
-                Plugin.NextWaveCi = customSquad;
-                response = $"Set next CI Spawnwave to {arg0}";
-            }
-            else if (customSquad.SquadType == SpawnableFaction.NtfMiniWave)
-            {
-                Plugin.NextWaveNtfMini = customSquad;
-                response = $"Set next MTF Miniwave to {arg0}";
-            }
-            else if (customSquad.SquadType == SpawnableFaction.ChaosMiniWave)
-            {
-                Plugin.NextWaveCiMini = customSquad;
-                response = $"Set next CI Miniwave to {arg0}";
-            }
-            else
+            CustomSquad customSquad = SquadManager.RegisteredSquads.Where(s => s.SquadName == arg0).FirstOrDefault();
+
+            if (customSquad is null)
             {
                 response = "Please input a squad";
                 return false;
             }
+
+            switch (customSquad.SquadType)
+            {
+                case SpawnableFaction.NtfWave:
+                    SquadManager.NextWaveNtf = customSquad;
+                    break;
+                case SpawnableFaction.NtfMiniWave:
+                    SquadManager.NextWaveNtfMini = customSquad;
+                    break;
+                case SpawnableFaction.ChaosWave:
+                    SquadManager.NextWaveCi = customSquad;
+                    break;
+                case SpawnableFaction.ChaosMiniWave:
+                    SquadManager.NextWaveCiMini = customSquad;
+                    break;
+            }
+
+            response = $"Set {customSquad.SquadType} spawnwave to {customSquad.SquadName}";
 
             Log.Info($"{sender.LogName} {response}");
             return true;
