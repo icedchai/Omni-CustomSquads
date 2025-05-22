@@ -173,6 +173,7 @@
                 players.Remove(player);
                 Log.Info($"Spawned {player} for {customSquad.SquadName}");
             }
+            players.Clear();
 
             if (customSquad.UseCassieAnnouncement)
             {
