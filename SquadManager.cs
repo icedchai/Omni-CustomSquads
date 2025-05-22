@@ -1,5 +1,6 @@
 ﻿namespace Omni_CustomSquads
 {
+    using Exiled.API.Features;
     using Omni_CustomSquads.EventHandlers;
     using System;
     using System.Collections.Generic;

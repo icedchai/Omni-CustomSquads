@@ -93,6 +93,7 @@
             {
                 if (SquadManager.NextWaveCiMini is null || SquadManager.NextWaveCiMini.SquadName == Plugin.VanillaSquad)
                 {
+                    SquadManager.NextWaveCiMini = null;
                     return;
                 }
 
@@ -105,6 +106,7 @@
             {
                 if (SquadManager.NextWaveCi is null || SquadManager.NextWaveCi.SquadName == Plugin.VanillaSquad)
                 {
+                    SquadManager.NextWaveCi = null;
                     return;
                 }
 
@@ -126,6 +128,7 @@
             {
                 if (SquadManager.NextWaveNtfMini is null || SquadManager.NextWaveNtfMini.SquadName == Plugin.VanillaSquad)
                 {
+                    SquadManager.NextWaveNtfMini = null;
                     return;
                 }
 
@@ -138,6 +141,7 @@
             {
                 if (SquadManager.NextWaveNtf is null || SquadManager.NextWaveNtf.SquadName == Plugin.VanillaSquad)
                 {
+                    SquadManager.NextWaveNtf = null;
                     return;
                 }
 
@@ -169,6 +173,7 @@
                 players.Remove(player);
                 Log.Info($"Spawned {player} for {customSquad.SquadName}");
             }
+            players.Clear();
 
             if (customSquad.UseCassieAnnouncement)
             {
@@ -208,6 +213,7 @@
                 case SpawnableFaction.ChaosWave:
                     {
                         customSquad = SquadManager.NextWaveCi;
+
                         if (customSquad is null)
                         {
                             SquadManager.NextWaveCi = SquadManager.CiPool.GetRandomSquad();
@@ -216,6 +222,11 @@
                             {
                                 return;
                             }
+                        }
+
+                        if (customSquad.SquadName == Plugin.VanillaSquad)
+                        {
+                            return;
                         }
 
                         HandleSpawnWave(customSquad, e.Players);
@@ -236,6 +247,11 @@
                             }
                         }
 
+                        if (customSquad.SquadName == Plugin.VanillaSquad)
+                        {
+                            return;
+                        }
+
                         HandleSpawnWave(customSquad, players);
                         break;
                     }
@@ -243,6 +259,7 @@
                 case SpawnableFaction.ChaosMiniWave:
                     {
                         customSquad = SquadManager.NextWaveCiMini;
+
                         if (customSquad is null)
                         {
                             SquadManager.NextWaveCiMini = SquadManager.CiMiniPool.GetRandomSquad();
@@ -251,6 +268,11 @@
                             {
                                 return;
                             }
+                        }
+
+                        if (customSquad.SquadName == Plugin.VanillaSquad)
+                        {
+                            return;
                         }
 
                         HandleSpawnWave(customSquad, e.Players);
@@ -269,6 +291,11 @@
                             {
                                 return;
                             }
+                        }
+
+                        if (customSquad.SquadName == Plugin.VanillaSquad)
+                        {
+                            return;
                         }
 
                         HandleSpawnWave(customSquad, players);
