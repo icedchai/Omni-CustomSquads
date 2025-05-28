@@ -11,18 +11,16 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    [HarmonyPatch(typeof(Footprint), MethodType.Constructor)]
+    [HarmonyPatch(typeof(Footprint), MethodType.Constructor, new Type[] { typeof(ReferenceHub) })]
     public static class FootprintConstructorPatch
     {
         internal static Dictionary<Footprint, OverallRoleType> FootprintOverallRoleLookupTable { get; set; } = new ();
 
         [HarmonyPostfix]
-        public static void Postfix(ReferenceHub hub, Footprint __result)
+        public static void Postfix(ReferenceHub hub, Footprint __instance)
         {
             Player player = Player.Get(hub);
-            FootprintOverallRoleLookupTable.Add(__result, player.GetOverallRoleType());
-            Log.Info(__result.Role);
-            Log.Info(player.Nickname);
+            FootprintOverallRoleLookupTable.Add(__instance, player.GetOverallRoleType());
         }
     }
 }

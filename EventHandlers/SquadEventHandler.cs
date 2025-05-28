@@ -30,6 +30,7 @@
         /// </summary>
         public void RegisterEvents()
         {
+            Exiled.Events.Handlers.Server.RoundStarted += Reset;
             Exiled.Events.Handlers.Map.AnnouncingScpTermination += OnAnnouncingScpTermination;
             Exiled.Events.Handlers.Player.Dying += OnDying;
             Exiled.Events.Handlers.Map.AnnouncingChaosEntrance += OnChaosAnnouncing;
@@ -42,11 +43,17 @@
         /// </summary>
         public void UnregisterEvents()
         {
+            Exiled.Events.Handlers.Server.RoundStarted -= Reset;
             Exiled.Events.Handlers.Map.AnnouncingScpTermination -= OnAnnouncingScpTermination;
             Exiled.Events.Handlers.Player.Dying -= OnDying;
             Exiled.Events.Handlers.Map.AnnouncingChaosEntrance -= OnChaosAnnouncing;
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= OnNtfAnnouncing;
             Exiled.Events.Handlers.Server.RespawningTeam -= OnSpawnWave;
+        }
+
+        private void Reset()
+        {
+            FootprintConstructorPatch.FootprintOverallRoleLookupTable.Clear();
         }
 
         /// <summary>
@@ -398,7 +405,7 @@
             }
 
             string announcementName = null;
-            OverallRoleType attackerRoleType = FootprintConstructorPatch.FootprintOverallRoleLookupTable[damageHandler.AttackerFootprint];
+            OverallRoleType attackerRoleType = attacker.GetOverallRoleType();
             FootprintConstructorPatch.FootprintOverallRoleLookupTable.Remove(damageHandler.AttackerFootprint);
 
             foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.Keys)
