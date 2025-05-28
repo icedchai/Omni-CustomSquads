@@ -12,6 +12,7 @@
     using Omni_CustomSquads.EventHandlers;
     using Omni_CustomSquads.Configs;
     using PlayerRoles;
+    using Omni_CustomSquads.Patches;
 
     /// <summary>
     /// The main plugin class.
@@ -57,6 +58,8 @@
             Singleton = this;
 
             Log.Debug($"{Config.CustomSquads.Count}");
+
+            Patcher.DoPatching();
 
             CustomSquad vanilla = new CustomSquad { SquadName = VanillaSquad, UseCassieAnnouncement = true };
 

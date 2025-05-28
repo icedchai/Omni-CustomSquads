@@ -19,6 +19,7 @@
     using Utils;
     using Exiled.API.Features.DamageHandlers;
     using Footprinting;
+    using Omni_CustomSquads.Patches;
 
     public class SquadEventHandler
     {
@@ -173,7 +174,6 @@
                 Player player = players.RandomItem();
                 Timing.CallDelayed(0.01f, () => player.SetOverallRoleType(roleType));
                 players.Remove(player);
-                Log.Info($"Spawned {player} for {customSquad.SquadName} as {roleType} ({((OverallRoleType)roleType).GetName()} {((OverallRoleType)roleType).RoleType} {((OverallRoleType)roleType).RoleId})");
             }
 
             players.Clear();
@@ -398,9 +398,12 @@
             }
 
             string announcementName = null;
+            OverallRoleType attackerRoleType = FootprintConstructorPatch.FootprintOverallRoleLookupTable[damageHandler.AttackerFootprint];
+            FootprintConstructorPatch.FootprintOverallRoleLookupTable.Remove(damageHandler.AttackerFootprint);
+
             foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.Keys)
             {
-                if (attacker.HasOverallRoleType(newType))
+                if (attackerRoleType == newType)
                 {
                     if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.TryGetValue(newType, out announcementName))
                     {

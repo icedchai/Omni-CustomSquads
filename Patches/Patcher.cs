@@ -7,14 +7,14 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class Patcher
+    public static class Patcher
     {
         /// <summary>
         /// Do patching.
         /// </summary>
         public static void DoPatching()
         {
-            var harmony = new Harmony("me.icedchai.cassie.patch");
+            var harmony = new Harmony("me.icedchai.squads.patch");
             harmony.PatchAll();
         }
     }
