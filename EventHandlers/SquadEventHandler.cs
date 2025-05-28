@@ -405,7 +405,7 @@
             }
 
             string announcementName = null;
-            OverallRoleType attackerRoleType = attacker.GetOverallRoleType();
+            OverallRoleType attackerRoleType = FootprintConstructorPatch.FootprintOverallRoleLookupTable[damageHandler.AttackerFootprint];
             FootprintConstructorPatch.FootprintOverallRoleLookupTable.Remove(damageHandler.AttackerFootprint);
 
             foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.Keys)
