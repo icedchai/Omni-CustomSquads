@@ -43,7 +43,7 @@
         public override string Prefix => "omni_customsquads";
 
         /// <inheritdoc/>
-        public override Version Version => new Version(1, 1, 2);
+        public override Version Version => new Version(1, 2, 0);
 
         private SquadManager SquadManager => SquadManager.Singleton;
 

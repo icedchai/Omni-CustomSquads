@@ -31,6 +31,12 @@
 
         public int NtfMiniVanillaChance { get; set; } = 100;
 
+        public CustomAnnouncement ThreatOverviewNoScps { get; set; } = new CustomAnnouncement { Words = "noscpsleft", Translation = "Substantial threat to safety remains within the facility -- exercise caution." };
+
+        public CustomAnnouncement ThreatOverviewOneScp { get; set; } = new CustomAnnouncement { Words = "awaitingrecontainment 1 scpsubject", Translation = "Awaiting recontainment of: 1 SCP subject." };
+
+        public CustomAnnouncement ThreatOverviewScps { get; set; } = new CustomAnnouncement { Words = "awaitingrecontainment %scps% scpsubjects", Translation = "Awaiting recontainment of: %scps% SCP subjects." };
+
         /// <summary>
         /// Gets or sets the list of <see cref="CustomSquad"/> to be registered.
         /// </summary>
