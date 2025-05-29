@@ -19,6 +19,26 @@
         public static SquadManager Singleton { get; private set; } = new SquadManager();
 
         /// <summary>
+        /// Gets a value indicating whether the NTF Wave is currently vanilla.
+        /// </summary>
+        public bool IsNtfVanilla => NextWaveNtf == null || NextWaveNtf.SquadName == Plugin.VanillaSquad;
+
+        /// <summary>
+        /// Gets a value indicating whether the NTF Miniwave is currently vanilla.
+        /// </summary>
+        public bool IsNtfMiniVanilla => NextWaveNtfMini == null || NextWaveNtfMini.SquadName == Plugin.VanillaSquad;
+
+        /// <summary>
+        /// Gets a value indicating whether the Ci Wave is currently vanilla.
+        /// </summary>
+        public bool IsCiVanilla => NextWaveCi == null || NextWaveCi.SquadName == Plugin.VanillaSquad;
+
+        /// <summary>
+        /// Gets a value indicating whether the Ci Miniwave is currently vanilla.
+        /// </summary>
+        public bool IsCiMiniVanilla => NextWaveCiMini == null || NextWaveCiMini.SquadName == Plugin.VanillaSquad;
+
+        /// <summary>
         /// Gets the next CustomSquad set to spawn.
         /// </summary>
         public CustomSquad NextWaveNtf { get; internal set; }

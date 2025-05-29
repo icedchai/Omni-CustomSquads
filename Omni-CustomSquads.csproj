@@ -103,6 +103,7 @@
     <Compile Include="ForceWaveCommand.cs" />
     <Compile Include="Patches\FootprintConstructorPatch.cs" />
     <Compile Include="Patches\Patcher.cs" />
+    <Compile Include="Patches\SubtitlePreventionPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SquadManager.cs" />

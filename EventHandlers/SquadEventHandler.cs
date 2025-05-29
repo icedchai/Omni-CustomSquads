@@ -230,7 +230,6 @@
         {
             CustomSquad customSquad;
             List<Player> players = e.Players;
-            Queue<RoleTypeId> queue = e.SpawnQueue;
             if (players.Count == 0)
             {
                 return;
@@ -407,7 +406,6 @@
 
             string announcementName = null;
             OverallRoleType attackerRoleType = FootprintConstructorPatch.FootprintOverallRoleLookupTable[damageHandler.AttackerFootprint];
-            FootprintConstructorPatch.FootprintOverallRoleLookupTable.Remove(damageHandler.AttackerFootprint);
 
             foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.Keys)
             {
