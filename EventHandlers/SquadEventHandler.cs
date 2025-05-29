@@ -210,6 +210,7 @@
                             threatOverviewSubs = Plugin.config.ThreatOverviewScps.Translation;
                             break;
                     }
+
                     if (NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule))
                     {
                         announcement = announcement.Replace("%division%", rule.TranslateToCassie(rule.LastGeneratedName)).Replace("%threat%", threatOverview).Replace("%scps%", $"{scpCount}");
