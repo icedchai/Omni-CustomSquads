@@ -194,7 +194,7 @@
                     string announcementSubs = customSquad.EntranceAnnouncementSubs;
                     string threatOverview;
                     string threatOverviewSubs;
-                    int scpCount = Player.List.Where(p => p.IsScp).Count();
+                    int scpCount = Player.List.Where(p => p.IsScp && p.Role != RoleTypeId.Scp0492).Count();
                     switch (scpCount)
                     {
                         case 0:
@@ -210,6 +210,7 @@
                             threatOverviewSubs = Plugin.config.ThreatOverviewScps.Translation;
                             break;
                     }
+
                     if (NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule))
                     {
                         announcement = announcement.Replace("%division%", rule.TranslateToCassie(rule.LastGeneratedName)).Replace("%threat%", threatOverview).Replace("%scps%", $"{scpCount}");
