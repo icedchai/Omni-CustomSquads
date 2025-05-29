@@ -5,8 +5,9 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using ColdWaterLibrary.Extensions;
-    using ColdWaterLibrary.Types;
+    using Omni_CustomSquads.Configs;
+    using ColdWaterLibrary.Features.Extensions;
+    using ColdWaterLibrary.Features.Wrappers;
     using Exiled.API.Enums;
     using Exiled.API.Features;
     using Exiled.Events.EventArgs.Map;
@@ -16,6 +17,9 @@
     using PlayerRoles;
     using Respawning.NamingRules;
     using Utils;
+    using Exiled.API.Features.DamageHandlers;
+    using Footprinting;
+    using Omni_CustomSquads.Patches;
 
     public class SquadEventHandler
     {
@@ -26,6 +30,7 @@
         /// </summary>
         public void RegisterEvents()
         {
+            Exiled.Events.Handlers.Server.RoundStarted += Reset;
             Exiled.Events.Handlers.Map.AnnouncingScpTermination += OnAnnouncingScpTermination;
             Exiled.Events.Handlers.Player.Dying += OnDying;
             Exiled.Events.Handlers.Map.AnnouncingChaosEntrance += OnChaosAnnouncing;
@@ -38,11 +43,17 @@
         /// </summary>
         public void UnregisterEvents()
         {
+            Exiled.Events.Handlers.Server.RoundStarted -= Reset;
             Exiled.Events.Handlers.Map.AnnouncingScpTermination -= OnAnnouncingScpTermination;
             Exiled.Events.Handlers.Player.Dying -= OnDying;
             Exiled.Events.Handlers.Map.AnnouncingChaosEntrance -= OnChaosAnnouncing;
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= OnNtfAnnouncing;
             Exiled.Events.Handlers.Server.RespawningTeam -= OnSpawnWave;
+        }
+
+        private void Reset()
+        {
+            FootprintConstructorPatch.FootprintOverallRoleLookupTable.Clear();
         }
 
         /// <summary>
@@ -161,8 +172,7 @@
                     break;
                 }
 
-                OverallRoleType roleType;
-                if (!customSquad.CustomRoles.TryGetValue(c, out roleType))
+                if (!customSquad.CustomRoles.TryGetValue(c, out string roleType))
                 {
                     Log.Info($"Couldn't find the specified role of Key {c} in {customSquad.SquadName}'s roles.");
                     break;
@@ -171,8 +181,8 @@
                 Player player = players.RandomItem();
                 Timing.CallDelayed(0.01f, () => player.SetOverallRoleType(roleType));
                 players.Remove(player);
-                Log.Info($"Spawned {player} for {customSquad.SquadName}");
             }
+
             players.Clear();
 
             if (customSquad.UseCassieAnnouncement)
@@ -182,11 +192,28 @@
                 {
                     string announcement = customSquad.EntranceAnnouncement;
                     string announcementSubs = customSquad.EntranceAnnouncementSubs;
-
+                    string threatOverview;
+                    string threatOverviewSubs;
+                    int scpCount = Player.List.Where(p => p.IsScp).Count();
+                    switch (scpCount)
+                    {
+                        case 0:
+                            threatOverview = Plugin.config.ThreatOverviewNoScps.Words;
+                            threatOverviewSubs = Plugin.config.ThreatOverviewNoScps.Translation;
+                            break;
+                        case 1:
+                            threatOverview = Plugin.config.ThreatOverviewOneScp.Words;
+                            threatOverviewSubs = Plugin.config.ThreatOverviewOneScp.Translation;
+                            break;
+                        default:
+                            threatOverview = Plugin.config.ThreatOverviewScps.Words;
+                            threatOverviewSubs = Plugin.config.ThreatOverviewScps.Translation;
+                            break;
+                    }
                     if (NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule))
                     {
-                        announcement = announcement.Replace("%division%", rule.TranslateToCassie(rule.LastGeneratedName));
-                        announcementSubs = announcementSubs.Replace("%division%", rule.LastGeneratedName);
+                        announcement = announcement.Replace("%division%", rule.TranslateToCassie(rule.LastGeneratedName)).Replace("%threat%", threatOverview).Replace("%scps%", $"{scpCount}");
+                        announcementSubs = announcementSubs.Replace("%division%", rule.LastGeneratedName).Replace("%threat%", threatOverviewSubs).Replace("%scps%", $"{scpCount}");
                     }
 
                     Cassie.MessageTranslated(announcement, announcementSubs);
@@ -330,7 +357,7 @@
         {
             if (Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.IsEnabled)
             {
-                AnnounceSubjectDeath(e.Attacker, e.Player);
+                AnnounceSubjectDeath(e.DamageHandler);
             }
         }
 
@@ -339,19 +366,17 @@
         /// </summary>
         /// <param name="attacker">The player who killed the victim.</param>
         /// <param name="victim">The player whose death is being announced.</param>
-        private void AnnounceSubjectDeath(Player attacker, Player victim)
+        private void AnnounceSubjectDeath(CustomDamageHandler damageHandler)
         {
             CustomAnnouncement subjectName = null;
-            if (victim is null)
-            {
-                return;
-            }
+            Player player = damageHandler.Target;
+            Player attacker = damageHandler.Attacker;
 
             if (attacker is null)
             {
                 foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.Keys)
                 {
-                    if (victim.HasOverallRoleType(newType))
+                    if (player.HasOverallRoleType(newType))
                     {
                         if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.TryGetValue(newType, out subjectName))
                         {
@@ -369,15 +394,23 @@
                     return;
                 }
 
-                CustomAnnouncement fallback = Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.FallbackTerminationAnnouncement;
-                Cassie.MessageTranslated(fallback.Words.Replace("%subject%", subjectName.Words), fallback.Translation.Replace("%subject%", subjectName.Translation));
+                CustomAnnouncement deathAnnouncement;
+                if (!Plugin.config.CustomTerminationAnnouncementConfig.NoAttackerTerminationMessages.TryGetValue(damageHandler.Type, out deathAnnouncement))
+                {
+                    deathAnnouncement = Plugin.config.CustomTerminationAnnouncementConfig.FallbackTerminationAnnouncement;
+                }
+
+                Cassie.MessageTranslated(deathAnnouncement.Words.Replace("%subject%", subjectName.Words), deathAnnouncement.Translation.Replace("%subject%", subjectName.Translation));
                 return;
             }
 
             string announcementName = null;
+            OverallRoleType attackerRoleType = FootprintConstructorPatch.FootprintOverallRoleLookupTable[damageHandler.AttackerFootprint];
+            FootprintConstructorPatch.FootprintOverallRoleLookupTable.Remove(damageHandler.AttackerFootprint);
+
             foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.Keys)
             {
-                if (attacker.HasOverallRoleType(newType))
+                if (attackerRoleType == newType)
                 {
                     if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationAnnouncementIndex.TryGetValue(newType, out announcementName))
                     {
@@ -398,7 +431,7 @@
             subs = announcement.Translation;
             foreach (OverallRoleType newType in Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.Keys)
             {
-                if (victim.HasOverallRoleType(newType))
+                if (player.HasOverallRoleType(newType))
                 {
                     if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpCassieString.TryGetValue(newType, out subjectName))
                     {
@@ -420,10 +453,10 @@
             subs = subs.Replace("%subject%", subjectName.Translation);
 
             // Make sure unit name is not empty.
-            if (!string.IsNullOrWhiteSpace(attacker.UnitName) && NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule))
+            if (!string.IsNullOrWhiteSpace(damageHandler.AttackerFootprint.UnitName) && NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule))
             {
-                cassie = cassie.Replace("%division%", rule.TranslateToCassie(attacker.UnitName));
-                subs = subs.Replace("%division%", attacker.UnitName);
+                cassie = cassie.Replace("%division%", rule.TranslateToCassie(damageHandler.AttackerFootprint.UnitName));
+                subs = subs.Replace("%division%", damageHandler.AttackerFootprint.UnitName);
             }
             else
             {

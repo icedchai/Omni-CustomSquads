@@ -6,21 +6,30 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using ColdWaterLibrary.Enums;
-    using ColdWaterLibrary.Types;
+    using ColdWaterLibrary.Features.Enums;
+    using ColdWaterLibrary.Features.Wrappers;
+    using Exiled.API.Enums;
     using PlayerRoles;
 
     public class CustomTerminationAnnouncementConfig
     {
         [Description("Whether this feature set is enabled")]
         public bool IsEnabled { get; set; } = true;
-        [Description("The cassie announcement when a subject dies without a valid attacker (attacker doesn't exist)")]
+
         public CustomAnnouncement FallbackTerminationAnnouncement { get; set; } = new CustomAnnouncement
         {
             Words = "%subject% terminated . termination cause unspecified",
-            Translation = "%subject% terminated. Termination cause unspecified."
+            Translation = "%subject% terminated. Termination cause unspecified.",
         };
-        public Dictionary<OverallRoleType, CustomAnnouncement> ScpCassieString { get; set; } = new Dictionary<OverallRoleType, CustomAnnouncement>()
+
+        public Dictionary<DamageType, CustomAnnouncement> NoAttackerTerminationMessages { get; set; } = new Dictionary<DamageType, CustomAnnouncement>
+        {
+            { DamageType.Warhead, new CustomAnnouncement { Words = "%subject% terminated by alpha warhead", Translation = "%subject% terminated by Alpha Warhead." } },
+            { DamageType.Decontamination, new CustomAnnouncement { Words = "%subject% lost in decontamination sequence", Translation = "%subject% lost in decontamination sequence." } },
+            { DamageType.Tesla, new CustomAnnouncement { Words = "%subject% terminated by automatic security system", Translation = "%subject% terminated by Automatic Security System." } },
+        };
+
+        public Dictionary<string, CustomAnnouncement> ScpCassieString { get; set; } = new Dictionary<string, CustomAnnouncement>()
         {
             {
                 new OverallRoleType { RoleId = (sbyte)RoleTypeId.Scp049, RoleType = TypeSystem.BaseGame, },
@@ -45,7 +54,7 @@
         };
 
         [Description("Use %subject% in the announcements for the termination's name. Key is overallroletype, Value is name of Key in scp_termination_cassie_announcements.")]
-        public Dictionary<OverallRoleType, string> ScpTerminationAnnouncementIndex { get; set; } = new Dictionary<OverallRoleType, string>
+        public Dictionary<string, string> ScpTerminationAnnouncementIndex { get; set; } = new Dictionary<string, string>
         {
             {
                 new OverallRoleType { RoleId = 6, RoleType = TypeSystem.BaseGame},
@@ -118,7 +127,7 @@
             },
             {
                 "mtf_facsec",
-                new CustomAnnouncement { Words = "%subject% containedsuccessfully containmentunit %division%", Translation = "%subject% contained successfully. Containment unit: %division%."}
+                new CustomAnnouncement { Words = "%subject% containedsuccessfully containmentunit %division%", Translation = "%subject% contained successfully. Containment Unit: %division%."}
             },
             {
                 "civil_science",
