@@ -212,8 +212,8 @@
                     }
                     if (NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule))
                     {
-                        announcement = announcement.Replace("%division%", rule.TranslateToCassie(rule.LastGeneratedName)).Replace("%threat%", threatOverview);
-                        announcementSubs = announcementSubs.Replace("%division%", rule.LastGeneratedName).Replace("%threat%", threatOverviewSubs);
+                        announcement = announcement.Replace("%division%", rule.TranslateToCassie(rule.LastGeneratedName)).Replace("%threat%", threatOverview).Replace("%scps%", $"{scpCount}");
+                        announcementSubs = announcementSubs.Replace("%division%", rule.LastGeneratedName).Replace("%threat%", threatOverviewSubs).Replace("%scps%", $"{scpCount}");
                     }
 
                     Cassie.MessageTranslated(announcement, announcementSubs);
