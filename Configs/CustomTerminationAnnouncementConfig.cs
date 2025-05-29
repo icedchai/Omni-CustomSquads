@@ -26,6 +26,7 @@
         {
             { DamageType.Warhead, new CustomAnnouncement { Words = "%subject% terminated by alpha warhead", Translation = "%subject% terminated by Alpha Warhead." } },
             { DamageType.Decontamination, new CustomAnnouncement { Words = "%subject% lost in decontamination sequence", Translation = "%subject% lost in decontamination sequence." } },
+            { DamageType.Tesla, new CustomAnnouncement { Words = "%subject% terminated by automatic security system", Translation = "%subject% terminated by Automatic Security System." } },
         };
 
         public Dictionary<string, CustomAnnouncement> ScpCassieString { get; set; } = new Dictionary<string, CustomAnnouncement>()
