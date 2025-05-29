@@ -44,7 +44,7 @@
         public override string Prefix => "omni_customsquads";
 
         /// <inheritdoc/>
-        public override Version Version => new Version(1, 2, 0);
+        public override Version Version => new Version(1, 2, 1);
 
         private SquadManager SquadManager => SquadManager.Singleton;
 
@@ -119,6 +119,8 @@
             base.OnDisabled();
             SquadManager.CiPool.ClearEntries();
             SquadManager.NtfPool.ClearEntries();
+            SquadManager.CiMiniPool.ClearEntries();
+            SquadManager.NtfMiniPool.ClearEntries();
             SquadEventHandler.UnregisterEvents();
             SquadEventHandler = null;
             Singleton = null;
