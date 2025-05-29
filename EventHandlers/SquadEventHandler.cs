@@ -194,7 +194,7 @@
                     string announcementSubs = customSquad.EntranceAnnouncementSubs;
                     string threatOverview;
                     string threatOverviewSubs;
-                    int scpCount = Player.List.Where(p => p.IsScp).Count();
+                    int scpCount = Player.List.Where(p => p.IsScp && p.Role != RoleTypeId.Scp0492).Count();
                     switch (scpCount)
                     {
                         case 0:
