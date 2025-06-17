@@ -421,7 +421,7 @@
             string cassie;
             string subs;
             CustomAnnouncement announcement;
-            if (!Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationCassieAnnouncements.TryGetValue(announcementName, out announcement))
+            if (announcementName is null || !Plugin.Singleton.Config.CustomTerminationAnnouncementConfig.ScpTerminationCassieAnnouncements.TryGetValue(announcementName, out announcement))
             {
                 return;
             }
